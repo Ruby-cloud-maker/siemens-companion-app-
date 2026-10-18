@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ovn-companion · Siemens HB76G1.60S</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--ink:#1c2230;--muted:#6b7385;--accent:#0a6cff;--warn:#b84a00;--ok:#127a3c;--line:#e2e5ec}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#111827;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:18px}
+header small{opacity:.7}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:58px;z-index:4}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:2px 0 10px}
+.muted{color:var(--muted);font-size:14px}
+.warn{color:var(--warn)}
+.ok{color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.opt{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;text-align:left;cursor:pointer;font:inherit}
+.opt.on{border:2px solid var(--accent);background:#eef5ff}
+.big{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;margin:6px 0}
+.big small{font-size:18px;font-weight:400;color:var(--muted)}
+input[type=range]{width:100%}
+input[type=text],input[type=number],input[type=time],select{font:inherit;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff}
+select{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.btn{font:inherit;padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.danger{color:var(--warn)}
+ul{padding-left:20px;margin:6px 0}
+li{margin:4px 0}
+label.chk{display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer}
+label.chk input{margin-top:5px;transform:scale(1.2)}
+.timer{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.timer .t{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.timer.done{border-color:var(--warn);background:#fff6ef}
+.search{width:100%;margin-bottom:10px}
+details{border-top:1px solid var(--line);padding:10px 0}
+summary{cursor:pointer;font-weight:600}
+.keyrow{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.kbd{min-width:44px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:8px;font-weight:700;padding:0 8px;flex:0 0 auto}
+.guide ol{padding-left:22px}
+.guide li{margin:6px 0}
+.stepimg{max-width:340px;margin:6px 0 4px}
+.howto{padding-left:22px}
+.howto li{margin:8px 0}
+.fnbtn{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.fnicon svg{width:44px;height:44px;display:block;color:var(--ink)}
+.fnbtn.on .fnicon svg{color:var(--accent)}
+.stepicons{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:4px}
+.kchip{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 8px;border-radius:7px;background:#cfd4dd;border:1px solid #6b7385;font-weight:700;font-size:12px;white-space:nowrap}
+.kchip.knob{width:30px;padding:0;border-radius:50%;font-size:16px;background:#aeb5c2}
+.stepicons .fnicon svg{width:30px;height:30px;color:var(--ink)}
+.pgroup{font-weight:700;margin:14px 0 4px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.progrow{display:grid;grid-template-columns:56px 1fr 120px;gap:8px;padding:10px 4px;border-top:1px solid var(--line);cursor:pointer}
+.progrow small{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ovn-companion</h1>
+  <small>Siemens HB76G1.60S · efter brugsanvisningen</small>
+</header>
+<nav id="nav">
+  <button data-tab="ovn" class="on">Ovn</button>
+  <button data-tab="guide">Guide</button>
+  <button data-tab="prog">Programmer</button>
+  <button data-tab="kod">Kød</button>
+  <button data-tab="rens">Rengøring</button>
+  <button data-tab="fejl">Fejl</button>
+</nav>
+<main><div id="view"></div></main>
+
+<script>
+/* ---------- DATA (fra brugsanvisningen) ---------- */
+const FUNCTIONS = [
+  {name:"3D-varmluft", min:30, max:275, def:160, use:"Kager og bagværk i 1–3 lag. Ventilatoren fordeler varmen jævnt. Bagerier: rille 2 til forme, rille 3 til plader."},
+  {name:"Varmluft eco", min:30, max:275, use:"Energieffektiv. Kager, gratiner, dybfrost, kød og fisk i ét lag uden forvarmning. Sæt retten i en kold, tom ovn."},
+  {name:"Over-/undervarme", min:30, max:300, def:180, use:"Kager i ét lag, gratiner og magert kød (oksekød, vildt). Varmen kommer oppefra og nedefra."},
+  {name:"HydroBagning", min:30, max:300, use:"Gærbrød, boller, fletbrød og vandbakkelsesdej. Fugten bliver i ovnen."},
+  {name:"Pizzatrin", min:30, max:275, use:"Hurtig dybfrost (pizza, pommes frites, strudel) uden forvarmning."},
+  {name:"Undervarme", min:30, max:300, use:"Henkogning og efterbagning eller -bruning. Varmen kommer nedefra."},
+  {name:"Varmluft/impulsgrill", min:30, max:300, use:"Stegning af kød, fjerkræ og hel fisk."},
+  {name:"Grill, stor flade", grill:true, use:"Steaks, pølser, toast, fisk i stykker. Grilltrin 1–3. Forvarm ca. 3 min."},
+  {name:"Grill, lille flade", grill:true, use:"Små mængder steaks, pølser, toast. Grilltrin 1–3."},
+  {name:"Optøning", min:30, max:60, use:"Kød, fjerkræ, brød og kager. Følg producentens anvisning på emballagen."},
+  {name:"Varmholdning", min:60, max:100, use:"Holder tilberedte retter varme."}
+];
+
+const MEAT = [
+  {group:"Oksekød", name:"Roastbeef / oksefilet, engelsk", min:45, max:55},
+  {group:"Oksekød", name:"Roastbeef / oksefilet, medium", min:55, max:65},
+  {group:"Oksekød", name:"Roastbeef / oksefilet, gennemstegt", min:65, max:75},
+  {group:"Svinekød", name:"Svinefilet", min:65, max:70},
+  {group:"Svinekød", name:"Flæskesteg (f.eks. nakkekam)", min:85, max:90},
+  {group:"Kalvekød", name:"Kalvesteg", min:75, max:85},
+  {group:"Kalvekød", name:"Kalveskank", min:85, max:90},
+  {group:"Lammekød", name:"Lammekølle, medium", min:60, max:70},
+  {group:"Lammekød", name:"Lammesteg", min:80, max:90}
+];
+
+const CLEAN_PREP = [
+  "Tag tilbehør, fade, risten og teleskopudtræk ud af ovnen",
+  "Tag ribberammerne ud – de kan ikke tåle selvrens",
+  "Fjern grove madrester, fedt og stegesaft – de kan antændes",
+  "Tør ovnrummet og kanterne langs tætningen af med en fugtig klud (selve tætningen rengøres ikke)",
+  "Ingen bageplader eller forme med slip-let-belægning, og ingen rist",
+  "Kun emaljeret tilbehør må være med, én tilbehørsdel ad gangen, med tilbehørsholderne i venstre og højre side",
+  "Hæng intet brændbart (fx viskestykke) på dørgrebet, og hold fronten fri",
+  "Stegetermometeret er taget ud af ovnen",
+  "Børn holdes på sikker afstand"
+];
+const CLEAN_LEVELS = [
+  {n:1, name:"let", min:75},
+  {n:2, name:"mellem", min:90},
+  {n:3, name:"intensiv", min:120}
+];
+
+const ERRORS = [
+  {q:"Apparatet fungerer ikke", steps:["Kontroller, om sikringen i sikringsskabet er i orden."]},
+  {q:"Klokken viser 00:00 efter strømafbrydelse", steps:["Stil klokkeslættet igen: tryk tast 6 (Ur), drej til klokkeslættet, og tryk tast 6."]},
+  {q:"Døren kan ikke åbnes. 00:00 vises, og låse-symbolet H lyser (strømafbrydelse under selvrens)", steps:["Stil klokkeslættet igen: tryk tast 6 (Ur), drej til klokkeslættet, og tryk tast 6.", "Vent, til låse-symbolet H slukkes. Så kan døren åbnes."]},
+  {q:"Ovnen varmer ikke, eller den valgte ovnfunktion kan ikke indstilles", steps:["Drej knappen til ovnfunktionen igen, så den bliver registreret."]},
+  {q:"Ovnen varmer ikke, og en lille firkant vises i temperaturdisplayet (demomodus)", steps:["Slå sikringen fra i sikringsskabet, og vent mindst 20 sekunder.", "Slå sikringen til igen.", "Inden for de næste 2 minutter: hold tast 8 (lynopvarmning) nede i 4 sekunder, indtil firkanten slukkes."]},
+  {q:"Symbolet for automatisk slukning vises, og ovnen varmer ikke", steps:["Tryk på en vilkårlig tast. Ovnen slukkede af sig selv, fordi der ikke var indstillet en varighed, og indstillingerne ikke var ændret i længere tid."]},
+  {q:"Fejlmeddelelse med tegnet “ og koden ‹‚‚ (en tast er trykket for længe, eller en tast sidder fast)", steps:["Tryk tast 6 (Ur) for at slette fejlmeddelelsen. Klokkeslættet skal muligvis stilles igen.", "Tryk på alle taster én ad gangen, og kontroller at de er rene.", "Vises meddelelsen igen, kontaktes kundeservice."]},
+  {q:"Fejlmeddelelse med tegnet “ og koden ‚‚† (ovnrummet er for varmt, og døren er låst)", steps:["Vent, til ovnrummet er kølet af. Døren er låst, indtil det sker.", "Slet fejlmeddelelsen med tast 6 (Ur)."]},
+  {q:"Ovnlampen virker ikke", steps:["Slå sikringen fra i sikringsskabet, før du skifter pære.", "Lampe i loftet: temperaturbestandig pære på 40 W.", "Venstre lampe: temperaturbestandig 230 V halogenpære på 25 W. Hold pæren med en tør klud, så den holder længere."]}
+];
+
+/* Ikoner på displayet (fra egne fotos af ovnen). Usikre er markeret. */
+const VIS = {
+  "3D-varmluft": "Ikon: ventilator med cirkelpil.",
+  "Varmluft eco": "Ikon: ventilator med bogstavet e.",
+  "Over-/undervarme": "Ikon: to streger, øverst og nederst.",
+  "HydroBagning": "Ikon: to streger og en vanddråbe.",
+  "Pizzatrin": "Ikon: ikke genkendt sikkert, tjek på displayet.",
+  "Undervarme": "Ikon: kun én streg nederst.",
+  "Varmluft/impulsgrill": "Ikon: bølger øverst og ventilator (sandsynligt).",
+  "Grill, stor flade": "Ikon: zigzag-grill øverst (sandsynligt).",
+  "Grill, lille flade": "Ikon: ikke genkendt sikkert.",
+  "Optøning": "Ikon: snefnug og vanddråbe (sandsynligt).",
+  "Varmholdning": "Ikon: ikke genkendt sikkert."
+};
+
+/* ---------- STATE ---------- */
+const state = {
+  fn: 2,          // Over-/undervarme som start
+  temp: 180,
+  grill: 2,
+  meat: 0,
+  core: 60,
+  cleanLevel: 3,
+};
+let tab = "ovn";
+
+/* ---------- HELPERS ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const midpoint = f => Math.round((f.min + f.max) / 2 / 5) * 5;
+
+function hhmm(d){ return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); }
+
+/* ---------- OVN ---------- */
+/* Ikoner for ovnfunktioner. Tegnet ud fra displayikonerne på ovnen (forenklet). */
+function fnIcon(name){
+  const frame = `<rect x="5" y="5" width="30" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>`;
+  const fanBlade = `<path d="M20 20 C17 15 19 11 23 12 C23 15 22 18 20 20Z" fill="currentColor"/>`;
+  const fan = `<g>${fanBlade}<g transform="rotate(120 20 20)">${fanBlade}</g><g transform="rotate(240 20 20)">${fanBlade}</g></g>`;
+  const topLine = `<line x1="9" y1="11" x2="31" y2="11" stroke="currentColor" stroke-width="2"/>`;
+  const botLine = `<line x1="9" y1="27" x2="31" y2="27" stroke="currentColor" stroke-width="2"/>`;
+  const zig = `<polyline points="9,12 13,9 17,12 21,9 25,12 29,9 31,12" fill="none" stroke="currentColor" stroke-width="2"/>`;
+  const drop = `<path d="M20 15 C18 18 17 19 17 21 A3 3 0 0 0 23 21 C23 19 22 18 20 15Z" fill="currentColor"/>`;
+  const circArrow = `<path d="M30 37 A4 4 0 1 0 34 33" fill="none" stroke="currentColor" stroke-width="1.6"/><polygon points="31,35 30,38 33,38" fill="currentColor"/>`;
+  const parts = {
+    "3D-varmluft": frame + fan + circArrow,
+    "Varmluft eco": frame + fan + `<text x="27" y="30" font-size="9" font-weight="700" fill="currentColor">e</text>`,
+    "Over-/undervarme": frame + topLine + botLine,
+    "HydroBagning": frame + topLine + botLine + drop,
+    "Pizzatrin": frame + botLine + `<circle cx="20" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/>`,
+    "Undervarme": frame + botLine,
+    "Varmluft/impulsgrill": frame + zig + fan,
+    "Grill, stor flade": frame + zig,
+    "Grill, lille flade": frame + `<polyline points="14,12 17,9 20,12 23,9 26,12" fill="none" stroke="currentColor" stroke-width="2"/>`,
+    "Optøning": frame + `<path d="M20 11 V25 M14 14 L26 22 M26 14 L14 22" stroke="currentColor" stroke-width="1.6" fill="none"/>`,
+    "Varmholdning": frame + `<path d="M9 14 q3 -3 6 0 t6 0 t6 0 t4 0" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21 q3 -3 6 0 t6 0 t6 0 t4 0" fill="none" stroke="currentColor" stroke-width="2"/>`
+  };
+  return `<svg viewBox="0 0 40 40" aria-hidden="true">${parts[name] || frame}</svg>`;
+}
+
+/* Ikon-række over et trin: tast-chips, drejeknap og (hvis trinet henviser til den valgte funktion) funktionsikonet. */
+function stepIcons(text){
+  const keys = [...new Set([...text.matchAll(/tast (\d+)/g)].map(m => +m[1]))];
+  const chips = keys.map(n => {
+    const k = PANEL.find(p => p.n === n);
+    return `<span class="kchip">${n} ${esc(k.t)}</span>`;
+  }).join("");
+  const knob = /drej/i.test(text) ? `<span class="kchip knob" title="Drejeknap">↻</span>` : "";
+  const fn = /valgt ovenfor/i.test(text) ? `<span class="fnicon">${fnIcon(FUNCTIONS[state.fn].name)}</span>` : "";
+  const all = chips + knob + fn;
+  return all ? `<div class="stepicons">${all}</div>` : "";
+}
+
+function updEnd(){
+  const out = $("#endout");
+  if (!out) return;
+  const d = clamp(+$("#dur").value || 0, 1, 600);
+  const r = $("#ready").value;
+  if (!r){
+    const end = new Date(Date.now() + d * 60000);
+    out.innerHTML = `Starter nu: klar ca. kl. <b>${hhmm(end)}</b>.`;
+  } else {
+    const [h, m] = r.split(":").map(Number);
+    const end = new Date(); end.setHours(h, m, 0, 0);
+    const start = new Date(end.getTime() - d * 60000);
+    out.innerHTML = `Start senest kl. <b>${hhmm(start)}</b>. Klar kl. ${hhmm(end)}.`;
+  }
+}
+
+function howTo(steps){
+  return `<ol class="howto">${steps.map(x => `<li>${stepIcons(x)}${esc(x)}${stepImg(x)}</li>`).join("")}</ol>`;
+}
+
+function renderOvn(){
+  const f = FUNCTIONS[state.fn];
+  const grill = !!f.grill;
+  const val = grill ? state.grill : state.temp;
+  const range = grill ? {min:1, max:3, step:1, unit:"grilltrin"} : {min:f.min, max:f.max, step:5, unit:"°C"};
+  $("#view").innerHTML = `
+    <div class="card">
+      <h2>1. Vælg ovnfunktion</h2>
+      <div class="grid">${FUNCTIONS.map((x,i) =>
+        `<button class="opt fnbtn ${i===state.fn?"on":""}" data-act="fn" data-i="${i}"><span class="fnicon">${fnIcon(x.name)}</span><span>${esc(x.name)}</span></button>`).join("")}</div>
+      <p class="muted" style="margin-bottom:4px">${esc(f.use)}</p>
+      <p class="muted" style="margin-top:0">${esc(VIS[f.name] || "")}</p>
+    </div>
+    <div class="card">
+      <h2>2. ${grill ? "Grilltrin" : "Temperatur"}</h2>
+      <div class="big"><span id="valout">${val}</span> <small>${range.unit}</small></div>
+      <input type="range" id="val" min="${range.min}" max="${range.max}" step="${range.step}" value="${val}">
+      ${grill ? "" : `<p class="muted">Område for ${esc(f.name)}: ${f.min}–${f.max} °C</p>`}
+    </div>
+    <div class="card">
+      <h2>Sådan indstiller du på ovnen</h2>
+      ${howTo([
+        "Tryk tast 1 (on/off) for at tænde ovnen.",
+        `Drej knappen til den ovnfunktion, du har valgt ovenfor: ${f.name}.`,
+        `Tryk tast 7 (°C/kg), og drej knappen til ${grill ? state.grill + " grilltrin" : state.temp + " °C"}.`,
+        "Tryk tast 10 (start/stop). Ovnen starter."
+      ])}
+    </div>
+    <div class="card">
+      <h2>Sådan gemmer du i ovnens Memory</h2>
+      <p class="muted">Ovnens Memory er den ene plads på selve ovnen. Den er ikke det samme som "Gem" nedenfor.</p>
+      ${howTo([
+        "Indstil ovnfunktion og temperatur (se ovenfor), men start ikke endnu.",
+        "Hold tast 4 (M) nede, indtil der lyder et signal, og tasten lyser.",
+        "Retten er nu gemt. Ny gemning overskriver den gamle."
+      ])}
+    </div>
+    <div class="card">
+      <h2>Sådan henter du ovnens Memory</h2>
+      ${howTo([
+        "Tryk tast 4 (M) kort. De gemte indstillinger vises.",
+        "Tryk tast 10 (start/stop) for at starte."
+      ])}
+    </div>
+    <div class="card">
+      <h2>Beregn sluttid</h2>
+      <p class="muted">Ovnen kan vente med at starte, så retten er klar på det tidspunkt, du vælger. Gælder ikke for stjernede programmer og ikke for Sabbat.</p>
+      <div class="row">
+        <label>Tilberedningstid <input type="number" id="dur" min="1" max="600" value="45" style="width:90px"> min</label>
+        <label>Klar kl. <input type="time" id="ready"></label>
+      </div>
+      <div id="endout" style="margin-top:10px"></div>
+      <p class="muted">Forudsætning: ovnfunktion og temperatur er valgt, og ovnen er ikke startet endnu.</p>
+      ${howTo([
+        "Tryk tast 6 (Ur) to gange, så pilen står ved varighed.",
+        "Drej knappen til tilberedningstiden.",
+        "Tryk tast 6, indtil markeringen forsvinder.",
+        "Tryk tast 6 igen, indtil pilen står ved slut-tid. Drej knappen til klokkeslættet.",
+        "Tryk tast 6, indtil markeringen forsvinder, og tryk tast 10 (start/stop). Ovnen venter og starter selv."
+      ])}
+    </div>
+    <div class="card muted">
+      Appen kan ikke styre ovnen. Indstil de samme værdier på ovnen og tryk på start/stop (tast 10).
+    </div>`;
+}
+
+/* ---------- KØD ---------- */
+function renderKod(){
+  const groups = [...new Set(MEAT.map(m => m.group))];
+  $("#view").innerHTML = `
+    <div class="card">
+      <h2>Stegetermometer</h2>
+      <select id="meat">
+        ${groups.map(g => `<optgroup label="${esc(g)}">${MEAT.map((m,i)=> m.group===g ? `<option value="${i}" ${i===state.meat?"selected":""}>${esc(m.name)}</option>` : "").join("")}</optgroup>`).join("")}
+      </select>
+      <h2 style="margin-top:16px">Kernetemperatur: <span id="coreOut">${state.core}</span> °C</h2>
+      <input type="range" id="core" step="1">
+      <div id="meatOut" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h2>Sådan indstiller du på ovnen</h2>
+      ${howTo([
+        "Stik stegetermometeret ind i stikket til venstre i ovnen, inden kødet kommer i.",
+        "Tryk tast 7 (°C/kg), og drej knappen til ovntemperaturen.",
+        "Tryk tast 7 igen, og drej knappen til kernetemperaturen.",
+        "Tryk tast 10 (start/stop). Ovnen starter og viser kernetemperaturen."
+      ])}
+    </div>
+    <div class="card">
+      <h2>Sådan bruger du stegetermometeret</h2>
+      <ul>
+        <li>Brug kun det stegetermometer, der følger med ovnen.</li>
+        <li>Stik spidsen midt i det tykkeste sted. Ikke ind i fedt, ben eller fad.</li>
+        <li>Placer stegen midt på risten.</li>
+        <li>Brug kun fersk, ikke frosset kød.</li>
+        <li>Tag termometeret ud efter brug, og opbevar det aldrig i ovnrummet.</li>
+        <li>Ovntemperaturen skal være mindst 10 °C højere end kernetemperaturen, og højst 250 °C med termometret.</li>
+      </ul>
+    </div>`;
+  updMeat();
+}
+function updMeat(){
+  const m = MEAT[state.meat];
+  const core = $("#core");
+  if (!core) return;
+  core.min = m.min; core.max = m.max;
+  state.core = clamp(state.core, m.min, m.max);
+  core.value = state.core;
+  $("#coreOut").textContent = state.core;
+  const ovnMin = Math.min(250, state.core + 10);
+  $("#meatOut").innerHTML = `
+    <p class="muted" style="margin:0">Vejledende område for ${esc(m.name)}: ${m.min}–${m.max} °C.</p>
+    <p style="margin:8px 0 0">Ovntemperatur: <b>mindst ${ovnMin} °C</b>, højst 250 °C.</p>
+    <p class="muted" style="margin:8px 0 0">Vejledende værdier. Kødets kvalitet og størrelse har betydning. Ved steg: lad den hvile ca. 10 min. i den slukkede, lukkede ovn.</p>`;
+}
+
+/* ---------- RENGØRING ---------- */
+function renderRens(){
+  $("#view").innerHTML = `
+    <div class="card">
+      <h2>Sådan starter du selvrens</h2>
+      ${howTo([
+        "Tryk tast 5 (selvrens). Trin 3 foreslås.",
+        "Drej knappen til trin 1, 2 eller 3.",
+        "Tryk tast 10 (start/stop). Døren låses kort efter start."
+      ])}
+    </div>
+    <div class="card">
+      <h2>Før selvrens</h2>
+      ${CLEAN_PREP.map((t,i)=>`<label class="chk"><input type="checkbox" id="pc${i}"><span>${esc(t)}</span></label>`).join("")}
+    </div>
+    <div class="card">
+      <h2>Rengøringstrin</h2>
+      <div class="grid">${CLEAN_LEVELS.map(l =>
+        `<button class="opt ${l.n===state.cleanLevel?"on":""}" data-act="lvl" data-n="${l.n}"><b>Trin ${l.n}</b> · ${l.name}<br><span class="muted">ca. ${Math.floor(l.min/60)} t${l.min%60? " "+(l.min%60)+" min":""}</span></button>`).join("")}
+      </div>
+      <p class="muted">Jo ældre og kraftigere snavs, jo højere trin. Rengør normalt hver 2.–3. måned. Et trin bruger ca. 2,5–4,7 kWh.</p>
+      <h2 style="margin-top:14px">Timing</h2>
+      <div class="row">
+        <label>Skal være færdig kl. <input type="time" id="fin"></label>
+      </div>
+      <div id="cleanOut" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h2>Under selvrens</h2>
+      <ul>
+        <li>Døren låses kort efter start og kan ikke åbnes før låse-symbolet slukkes.</li>
+        <li>Rengøringstrinnet kan ikke ændres efter start.</li>
+        <li>Ovnlampen lyser ikke under selvrens. Ovnen og døren bliver meget varme.</li>
+        <li>Brug aldrig højtryksrenser eller dampstråler.</li>
+      </ul>
+    </div>`;
+  updClean();
+}
+function updClean(){
+  const out = $("#cleanOut");
+  if (!out) return;
+  const lvl = CLEAN_LEVELS.find(l => l.n === state.cleanLevel);
+  const fin = $("#fin") ? $("#fin").value : "";
+  if (fin){
+    const [h, m] = fin.split(":").map(Number);
+    const end = new Date(); end.setHours(h, m, 0, 0);
+    const start = new Date(end.getTime() - lvl.min * 60000);
+    out.innerHTML = `Start senest kl. <b>${hhmm(start)}</b>. Færdig kl. ${hhmm(end)}.
+      <div class="muted">Tidsforskydning: sæt sluttid på ovnen ved at vælge Slut-tid og dreje til det tidspunkt, du har sat her.</div>`;
+  } else {
+    const end = new Date(Date.now() + lvl.min * 60000);
+    out.innerHTML = `Starter nu: færdig ca. kl. <b>${hhmm(end)}</b>.`;
+  }
+}
+
+/* ---------- FEJL ---------- */
+function renderFejl(){
+  $("#view").innerHTML = `
+    <div class="card">
+      <h2>Fejl – hvad gør jeg?</h2>
+      <p class="muted">Fejlmeddelelser med tegnet “ slettes med tast 6 (Ur). Koderne er gengivet som i manualen; tegnene kan se lidt anderledes ud på dit display.</p>
+      <input type="text" id="q" class="search" placeholder="Søg fx 'døren' eller 'lampe'">
+      <div id="errlist"></div>
+    </div>
+    <div class="card">
+      <h2>Kundeservice</h2>
+      <p>Typeskiltet med E-nr. og FD-nr. sidder til højre på siden af ovndøren. Skriv dem ned, før du ringer.</p>
+      <p>Kundeservice Danmark: <b>44 89 89 85</b>. Et servicebesøg er ikke gratis ved fejlbetjening, heller ikke i garantitiden.</p>
+      <p class="warn">Reparationer må kun udføres af serviceteknikere, der er uddannet af producenten. Hvis ovnen er defekt, skal du trække stikket ud eller slå sikringen fra.</p>
+    </div>`;
+  drawErrors("");
+}
+function drawErrors(q){
+  const s = q.trim().toLowerCase();
+  const list = ERRORS.filter(e => !s || (e.q + " " + e.steps.join(" ")).toLowerCase().includes(s));
+  $("#errlist").innerHTML = list.length
+    ? list.map(e => `<details><summary>${esc(e.q)}</summary>${howTo(e.steps)}</details>`).join("")
+    : `<p class="muted">Ingen match. Prøv et andet ord.</p>`;
+}
+
+/* ---------- GUIDE: ovnens betjeningsfelt (efter brugerens egen ovn) ---------- */
+const PANEL = [
+  {n:1,  x:10,  t:"on/off", name:"Tænd / sluk", d:"Tænder og slukker ovnen. Når den er tændt, vises 3D-varmluft og 160 °C som forslag."},
+  {n:2,  x:68,  t:"□",      name:"Ovnfunktion", d:"Vælg ovnfunktion. Drej derefter drejeknappen til den ønskede funktion."},
+  {n:3,  x:126, t:"P",      name:"Programautomatik", d:"Vælg et program P1–P40 efter ret og vægt. Find nummeret i manualens tabel."},
+  {n:4,  x:184, t:"M",      name:"Memory", d:"Langt tryk: gem indstillingerne. Kort tryk: start den gemte ret."},
+  {n:5,  x:242, t:"▦",      name:"Selvrens", d:"Vælg selvrens og et rengøringstrin (1–3)."},
+  {n:6,  x:370, t:"Ur",     name:"Ur / tidsfunktioner", d:"Åbner tidsmenuen: varighed, slut-tid og klokkeslæt. Tryk igen for at skifte mellem dem."},
+  {n:7,  x:428, t:"°C/kg",  name:"Temperatur / vægt", d:"Skifter, hvad drejeknappen ændrer: temperatur, grilltrin eller vægt."},
+  {n:8,  x:486, t:"≋",      name:"Lynopvarmning / børnesikring", d:"Kort tryk: lynopvarmning. Langt tryk (ca. 4 sek.): børnesikring."},
+  {n:9,  x:544, t:"i",      name:"Vis temperatur / grundindstillinger", d:"Kort tryk: vis aktuel temperatur. Langt tryk (ca. 4 sek.): grundindstillinger."},
+  {n:10, x:602, t:"▶/■",    name:"Start / stop", d:"Kort tryk: start eller pause. Langt tryk: afbryd driften."}
+];
+
+const GUIDE = [
+  {t:"Tænd ovnen og varm op", s:[
+    "Tryk tast 1 (on/off). Displayet viser 3D-varmluft og 160 °C som forslag.",
+    "Drej drejeknappen til den ønskede ovnfunktion. Vil du vælge funktion igen senere, så tryk tast 2 først.",
+    "Tryk tast 7 (°C/kg). Markeringen flytter til temperaturen.",
+    "Drej drejeknappen til temperaturen.",
+    "Tryk tast 10 (start/stop). Ovnen starter."
+  ], tip:"Sæt retten i, når temperaturkontrollen (bjælkerne) er helt fyldt ud."},
+  {t:"Skift temperatur undervejs", s:[
+    "Tryk tast 7, hvis markeringen ikke allerede står ved temperaturen.",
+    "Drej til den nye temperatur. Det kan altid ændres under drift."
+  ]},
+  {t:"Lynopvarmning", s:[
+    "Tryk tast 8 kort. Opvarmningen starter.",
+    "Der lyder et kort signal, når ovnen er klar. Sæt retten i nu.",
+    "Tryk tast 8 igen for at afbryde."
+  ], tip:"Virker ikke med alle funktioner og heller ikke under 100 °C. Skifter du funktion, afbrydes den."},
+  {t:"Tilberedningstid (varighed)", s:[
+    "Ovnen skal være tændt med funktion og temperatur.",
+    "Tryk tast 6 to gange, så pilen står ved varighed.",
+    "Drej til tiden.",
+    "Tryk tast 6, indtil markeringen forsvinder.",
+    "Tryk tast 10 (start/stop). Ovnen slukker af sig selv, når tiden er gået."
+  ]},
+  {t:"Udskudt slut-tid", s:[
+    "Stil varigheden først (se ovenfor). Start ikke endnu.",
+    "Tryk tast 6, indtil pilen står ved slut-tid.",
+    "Drej til det tidspunkt, retten skal være færdig.",
+    "Tryk tast 6, indtil markeringen forsvinder.",
+    "Tryk tast 10. Ovnen venter og starter selv, så retten er klar på det valgte tidspunkt."
+  ], tip:"Letfordærvelige fødevarer bør ikke stå for længe i ovnen."},
+  {t:"Programautomatik (P1–P40)", s:[
+    "Find programnummeret i manualens tabel for din ret.",
+    "Tryk tast 3 (P). Første programnummer vises i temperaturdisplayet.",
+    "Drej til programnummeret.",
+    "Tryk tast 7 (°C/kg). Den foreslåede vægt vises.",
+    "Drej til stegens vægt (ikke fadets).",
+    "Tryk tast 10 (start/stop). Programmet starter."
+  ], tip:"Efter start kan program og tid ikke ændres. Vil du ændre noget, så afbryd med langt tryk på tast 10 og start forfra."},
+  {t:"Memory: gem og hent en ret", s:[
+    "Indstil ovnfunktion og temperatur (se Tænd ovnen og varm op), men start ikke endnu.",
+    "Hold tast 4 (M) nede, indtil der lyder et signal, og tasten lyser.",
+    "Retten er nu gemt. Næste gang: tryk tast 4 kort, så vises de gemte indstillinger.",
+    "Tryk tast 10 (start/stop) for at starte."
+  ], tip:"Ovnen har kun én Memory-plads. Ny gemning overskriver den gamle. Selvrens kan ikke gemmes. Det er ovnens egen Memory, som gemmes på selve ovnen."},
+  {t:"Stegetermometer", s:[
+    "Stik stegetermometeret ind i stikket til venstre i ovnen, og stik spidsen i kødet, inden kødet kommer i.",
+    "Drej til ovnfunktionen, og tryk tast 7 for at sætte ovntemperaturen.",
+    "Tryk tast 7 igen, og drej til kernetemperaturen.",
+    "Tryk tast 10. Ovnen starter og viser kernetemperaturen fra 30 °C.",
+    "Der lyder et signal, når kernen er nået. Træk termometeret ud med grydelap."
+  ], tip:"Ovnen skal være mindst 10 °C varmere end kernetemperaturen, og højst 250 °C med termometret."},
+  {t:"Selvrens", s:[
+    "Tag tilbehør, ribberammer og fade ud af ovnen, og fjern grove madrester.",
+    "Tryk tast 5 (selvrens).",
+    "Trin 3 foreslås. Drej for at vælge trin 1, 2 eller 3.",
+    "Tryk tast 10. Døren låses kort efter start."
+  ], tip:"Efter start kan trinnet ikke ændres. Døren åbnes først, når låse-symbolet er slukket. Bagefter tørres aske af med en fugtig klud, når ovnen er kølet af."},
+  {t:"Afbryd eller sluk", s:[
+    "Kort tryk på tast 10 pauser driften. Tryk tast 10 igen for at fortsætte.",
+    "Langt tryk på tast 10 afbryder driften.",
+    "Tryk tast 1 for at slukke ovnen helt."
+  ]},
+  {t:"Børnesikring", s:[
+    "Hold tast 8 nede i ca. 4 sekunder, indtil låse-symbolet vises. Betjeningsfeltet er låst.",
+    "Hold tast 8 nede igen, indtil symbolet slukkes, for at låse op."
+  ], tip:"Du kan stadig slukke med tast 1 og afbryde med langt tryk på tast 10."},
+  {t:"Vis temperatur og indstil klokken", s:[
+    "Vis aktuel temperatur i ovnen: tryk tast 9 (i) kort.",
+    "Stil klokken, når ovnen er slukket: tryk tast 6 (Ur), indtil pilen står ved klokkesymbolet.",
+    "Drej til klokkeslættet, og tryk tast 6 for at gemme."
+  ], tip:"Blinker klokken efter strømsvigt, skal den stilles igen."},
+  {t:"Grundindstillinger", s:[
+    "Ovnen skal være slukket.",
+    "Hold tast 9 (i) nede i ca. 4 sekunder.",
+    "Tryk tast 9 for at skifte mellem indstillingerne, og drej for at ændre værdien.",
+    "Hold tast 9 nede, indtil displayet slukkes, for at gemme. Tast 1 annullerer uden at gemme."
+  ]}
+];
+
+/* Betjeningsfelt-billede. hl = tastenumre der skal lyse, knob = drejeknappen lyser. */
+function panelSVG(opts = {}){
+  const hl = opts.hl || [];
+  const knob = !!opts.knob;
+  const interactive = !!opts.interactive;
+  const cls = interactive ? "pkey" : "mkey";
+  const keys = PANEL.map(k => {
+    const on = hl.includes(k.n);
+    return `
+    <g class="${cls}" data-n="${k.n}" style="cursor:${interactive ? "pointer" : "default"}">
+      <rect x="${k.x}" y="190" width="48" height="44" rx="8" fill="${on ? "#ffd166" : "#cfd4dd"}" stroke="${on ? "#c77700" : "#6b7385"}" stroke-width="${on ? 3 : 1.5}"/>
+      <text x="${k.x+24}" y="217" text-anchor="middle" font-size="12" font-weight="700" fill="#1c2230">${esc(k.t)}</text>
+      <circle cx="${k.x+42}" cy="196" r="10" fill="#0a6cff"/>
+      <text x="${k.x+42}" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${k.n}</text>
+    </g>`;
+  }).join("");
+  return `<svg viewBox="0 0 660 270" width="100%" role="img" aria-label="Betjeningsfelt på ovnen">
+    <rect x="0" y="0" width="660" height="270" rx="14" fill="#8a919e"/>
+    <rect x="20" y="10" width="620" height="70" rx="10" fill="#0b1220"/>
+    <rect x="40" y="22" width="170" height="46" rx="6" fill="#1f3550"/>
+    <rect x="245" y="22" width="170" height="46" rx="6" fill="#1f3550"/>
+    <rect x="450" y="22" width="170" height="46" rx="6" fill="#1f3550"/>
+    <text x="125" y="52" text-anchor="middle" font-size="15" fill="#cfe6ff">3D-varmluft</text>
+    <text x="330" y="55" text-anchor="middle" font-size="28" fill="#cfe6ff">12:08</text>
+    <text x="535" y="53" text-anchor="middle" font-size="26" fill="#cfe6ff">160 °C</text>
+    ${keys}
+    <circle cx="330" cy="212" r="28" fill="${knob ? "#ffd166" : "#aeb5c2"}" stroke="${knob ? "#c77700" : "#4b5263"}" stroke-width="${knob ? 3 : 2}"/>
+    <text x="330" y="258" text-anchor="middle" font-size="12" fill="#1c2230">drejeknap</text>
+  </svg>`;
+}
+
+/* Billede til et trin: finder de tast-numre og "drej" der står i teksten og lyser dem op. */
+function stepImg(text){
+  const hl = [...new Set([...text.matchAll(/tast (\d+)/g)].map(m => +m[1]))];
+  const knob = /drej/i.test(text);
+  if (!hl.length && !knob) return "";
+  return `<div class="stepimg">${panelSVG({hl, knob})}</div>`;
+}
+
+function renderGuide(){
+  $("#view").innerHTML = `
+    <div class="card guide">
+      <h2>Betjeningsfeltet</h2>
+      <p class="muted">Tryk på en tast i billedet for at se, hvad den gør. Tallene går igen i trinene nedenfor.</p>
+      <div style="margin:8px 0">${panelSVG({interactive:true})}</div>
+      <p id="pinfo" class="muted" style="min-height:3em">Tryk på en tast.</p>
+    </div>
+    <div class="card guide">
+      <h2>Trin for trin</h2>
+      <p class="muted">Under hvert trin ses, hvilken tast eller hvilket drej der skal bruges. Den gule markering er den, du skal bruge.</p>
+      ${GUIDE.map((g,i) => `
+        <details ${i===0?"open":""}>
+          <summary>${esc(g.t)}</summary>
+          <ol>${g.s.map(x => `<li>${esc(x)}${stepImg(x)}</li>`).join("")}</ol>
+          ${g.tip ? `<p class="muted">${esc(g.tip)}</p>` : ""}
+        </details>`).join("")}
+    </div>`;
+  document.querySelectorAll(".pkey").forEach(g => g.addEventListener("click", () => {
+    const k = PANEL.find(p => p.n === +g.dataset.n);
+    $("#pinfo").innerHTML = `<b>${k.n}. ${esc(k.name)}</b><br>${esc(k.d)}`;
+    document.querySelectorAll(".pkey rect").forEach(r => r.setAttribute("fill", "#cfd4dd"));
+    g.querySelector("rect").setAttribute("fill", "#9fc5ff");
+  }));
+}
+
+/* ---------- PROGRAMMER P1–P40 (fra brugsanvisningen) ---------- */
+/* stop = stjerne i manualen: slut-tid kan ikke udskydes */
+const PROGRAMS = [
+  {n:1,  g:"Fjerkræ", name:"Kylling, fersk", w:"0,7–2,0", water:"nej", weight:"Kødvægt", stop:true},
+  {n:2,  g:"Fjerkræ", name:"Poulard, fersk", w:"1,4–2,3", water:"nej", weight:"Kødvægt", stop:true},
+  {n:3,  g:"Fjerkræ", name:"And, fersk", w:"1,6–2,7", water:"nej", weight:"Kødvægt", stop:true},
+  {n:4,  g:"Fjerkræ", name:"Gås, fersk", w:"2,5–3,5", water:"nej", weight:"Kødvægt", stop:true},
+  {n:5,  g:"Fjerkræ", name:"Lille kalkun, fersk", w:"2,5–3,5", water:"nej", weight:"Kødvægt", stop:true},
+  {n:6,  g:"Fjerkræ", name:"Hele lår, ferske (kylling, and, gås, kalkun)", w:"0,3–1,5", water:"nej", weight:"Vægt af det tungeste lår", stop:true},
+  {n:7,  g:"Oksekød", name:"Grydesteg, fersk (f.eks. højreb, forskank, bov, sursteg)", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:8,  g:"Oksekød", name:"Grydesteg, frossen (f.eks. højreb, forskank, bov)", w:"0,5–2,0", water:"ja", weight:"Kødvægt", stop:true},
+  {n:9,  g:"Oksekød", name:"Roastbeef, fersk, engelsk (f.eks. mørbrad)", w:"0,5–2,5", water:"nej", weight:"Kødvægt"},
+  {n:10, g:"Kalvekød", name:"Steg, fersk, mager (f.eks. inderlår, bøf)", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:11, g:"Kalvekød", name:"Steg, fersk, fedtmarmoreret (f.eks. nakke, hals)", w:"0,5–3,0", water:"lidt", weight:"Kødvægt"},
+  {n:12, g:"Kalvekød", name:"Skank med ben, fersk", w:"0,5–2,5", water:"ja", weight:"Kødvægt"},
+  {n:13, g:"Lammekød", name:"Lammekølle, fersk, uden ben, gennemstegt", w:"0,5–2,5", water:"lidt", weight:"Kødvægt"},
+  {n:14, g:"Lammekød", name:"Lammekølle, fersk, uden ben, medium", w:"0,5–2,5", water:"nej", weight:"Kødvægt"},
+  {n:15, g:"Lammekød", name:"Lammekølle, fersk, med ben, gennemstegt", w:"0,5–2,5", water:"lidt", weight:"Kødvægt"},
+  {n:16, g:"Lammekød", name:"Lammekølle, frossen, uden ben, gennemstegt", w:"0,5–2,0", water:"lidt", weight:"Kødvægt", stop:true},
+  {n:17, g:"Lammekød", name:"Lammekølle, frossen, med ben, gennemstegt", w:"0,5–2,0", water:"lidt", weight:"Kødvægt", stop:true},
+  {n:18, g:"Vildt", name:"Hjortesteg, fersk (f.eks. bov, bryst)", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:19, g:"Vildt", name:"Rådyrkølle, uden ben, fersk", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:20, g:"Vildt", name:"Harekølle med ben, fersk", w:"0,3–0,6", water:"ja", weight:"Kødvægt"},
+  {n:21, g:"Vildt", name:"Kanin, fersk", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:22, g:"Fisk", name:"Forel, fersk, dampkogt", w:"0,3–1,5", water:"ja", weight:"Samlet vægt", stop:true},
+  {n:23, g:"Fisk", name:"Forel, fersk, bagt", w:"0,3–1,5", water:"nej", weight:"Samlet vægt", stop:true},
+  {n:24, g:"Fisk", name:"Torsk, fersk, dampet", w:"0,5–2,0", water:"ja", weight:"Samlet vægt", stop:true},
+  {n:25, g:"Fisk", name:"Torsk, fersk, bagt", w:"0,5–2,0", water:"nej", weight:"Samlet vægt", stop:true},
+  {n:26, g:"Sammenkogt ret", name:"Med kød (f.eks. gryderet fra Pichelstein)", w:"0,3–3,0", water:"ja", weight:"Kødvægt"},
+  {n:27, g:"Sammenkogt ret", name:"Med grøntsager (f.eks. sammenkogt vegetarret)", w:"0,3–3,0", water:"ja", weight:"Samlet vægt"},
+  {n:28, g:"Sammenkogt ret", name:"Gullasch", w:"0,3–3,0", water:"ja", weight:"Kødvægt"},
+  {n:29, g:"Sammenkogt ret", name:"Benløse fugle", w:"0,3–3,0", water:"ja", weight:"Kødvægt"},
+  {n:30, g:"Forloren hare", name:"Af fersk oksekød", w:"0,3–3,0", water:"nej", weight:"Samlet vægt"},
+  {n:31, g:"Forloren hare", name:"Af fersk lammekød", w:"0,3–3,0", water:"nej", weight:"Samlet vægt", stop:true},
+  {n:32, g:"Forloren hare", name:"Af fersk kød, blandet", w:"0,3–3,0", water:"nej", weight:"Samlet vægt", stop:true},
+  {n:33, g:"Forloren hare", name:"Af fersk svinekød", w:"0,3–3,0", water:"nej", weight:"Samlet vægt", stop:true},
+  {n:34, g:"Svinekød", name:"Nakkekam, fersk, uden ben", w:"0,5–3,0", water:"ja", weight:"Kødvægt"},
+  {n:35, g:"Svinekød", name:"Nakkekam, frossen, uden ben", w:"0,5–2,0", water:"ja", weight:"Kødvægt", stop:true},
+  {n:36, g:"Svinekød", name:"Mørbrad, fersk", w:"0,5–2,5", water:"ja", weight:"Kødvægt"},
+  {n:37, g:"Svinekød", name:"Rullesteg, fersk", w:"0,5–3,0", water:"ja", weight:"Samlet vægt"},
+  {n:38, g:"Svinekød", name:"Steg med svær, fersk, stegeflæsk", w:"0,5–3,0", water:"nej", weight:"Kødvægt"},
+  {n:39, g:"Svinekød", name:"Skinkesteg, fersk, speget, stegt", w:"1,0–4,0", water:"lidt", weight:"Kødvægt"},
+  {n:40, g:"Svinekød", name:"Skinkesteg, fersk, speget, sprødbagt", w:"1,0–4,0", water:"nej", weight:"Kødvægt", stop:true}
+];
+
+function renderProg(){
+  $("#view").innerHTML = `
+    <div class="card">
+      <h2>Programautomatik (P1–P40)</h2>
+      <p class="muted">Tryk på en ret for at se, hvordan du indstiller ovnen. Vægten er stegens vægt, ikke fadets. Er stegetermometeret i stikket, kan programmer og selvrens ikke vælges.</p>
+      <input type="text" id="pq" class="search" placeholder="Søg fx 'lam', 'fisk' eller 'P12'">
+      <div id="proglist"></div>
+    </div>
+    <div class="card" id="progdetail">
+      <h2>Sådan gør du</h2>
+      <p class="muted">Tryk på en ret i listen ovenfor.</p>
+    </div>
+    <div class="card muted">
+      Væde: <b>ja</b> = hæld rigeligt væde i fadet. <b>lidt</b> = ca. 2–3 spiseskefulde. <b>nej</b> = ingen væde.
+      <br>Stjerne (*) = slut-tid kan ikke udskydes for denne ret.
+    </div>`;
+  drawProg("");
+  $("#pq").addEventListener("input", e => drawProg(e.target.value));
+}
+
+function drawProg(q){
+  const s = q.trim().toLowerCase();
+  const list = PROGRAMS.filter(p => !s || `p${p.n} ${p.g} ${p.name}`.toLowerCase().includes(s));
+  let html = "", last = "";
+  list.forEach(p => {
+    if (p.g !== last){ html += `<div class="pgroup">${esc(p.g)}</div>`; last = p.g; }
+    html += `<div class="progrow" data-n="${p.n}">
+      <b>P${p.n}${p.stop ? "*" : ""}</b>
+      <span>${esc(p.name)}<br><small>${esc(p.weight)}</small></span>
+      <span>${esc(p.w)} kg<br><small>væde: ${esc(p.water)}</small></span>
+    </div>`;
+  });
+  $("#proglist").innerHTML = html || `<p class="muted">Ingen match.</p>`;
+  document.querySelectorAll(".progrow").forEach(r => r.addEventListener("click", () => showProg(+r.dataset.n)));
+}
+
+function showProg(n){
+  const p = PROGRAMS.find(x => x.n === n);
+  $("#progdetail").innerHTML = `
+    <h2>P${p.n}: ${esc(p.name)}</h2>
+    <p class="muted">Vægt: ${esc(p.w)} kg · ${esc(p.weight)} · væde: ${esc(p.water)}</p>
+    ${howTo([
+      "Tryk tast 3 (P). Første programnummer vises i temperaturdisplayet.",
+      `Drej knappen til P${p.n}.`,
+      "Tryk tast 7 (°C/kg). Den foreslåede vægt vises.",
+      `Drej knappen til vægten (${p.w} kg). Vælg ${p.weight.toLowerCase()}.`,
+      "Tryk tast 10 (start/stop). Programmet starter."
+    ])}
+    ${p.stop ? `<p class="warn">Slut-tid kan ikke udskydes for denne ret.</p>` : ""}
+    <p class="muted">Efter start kan program og tid ikke ændres. Vil du ændre noget, så afbryd med langt tryk på tast 10.</p>`;
+  $("#progdetail").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ---------- ROUTER & EVENTS ---------- */
+const RENDER = {ovn:renderOvn, prog:renderProg, guide:renderGuide, kod:renderKod, rens:renderRens, fejl:renderFejl};
+function render(){
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  RENDER[tab]();
+}
+
+$("#nav").addEventListener("click", e => {
+  const b = e.target.closest("[data-tab]");
+  if (!b) return;
+  tab = b.dataset.tab;
+  render();
+});
+
+$("#view").addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const act = el.dataset.act;
+  if (act === "fn"){
+    state.fn = +el.dataset.i;
+    const f = FUNCTIONS[state.fn];
+    if (!f.grill) state.temp = clamp(f.def ?? midpoint(f), f.min, f.max);
+    render();
+  }
+  if (act === "lvl"){ state.cleanLevel = +el.dataset.n; renderRens(); }
+});
+
+
+$("#view").addEventListener("input", e => {
+  const id = e.target.id;
+  if (id === "val"){
+    const f = FUNCTIONS[state.fn];
+    if (f.grill) state.grill = +e.target.value; else state.temp = +e.target.value;
+    $("#valout").textContent = e.target.value;
+  }
+  if (id === "core"){
+    state.core = +e.target.value;
+    $("#coreOut").textContent = state.core;
+    updMeat();
+  }
+  if (id === "fin") updClean();
+  if (id === "dur" || id === "ready") updEnd();
+});
+
+$("#view").addEventListener("change", e => {
+  if (e.target.id === "meat"){ state.meat = +e.target.value; updMeat(); }
+  if (e.target.id === "q") drawErrors(e.target.value);
+});
+$("#view").addEventListener("keyup", e => {
+  if (e.target.id === "q") drawErrors(e.target.value);
+});
+
+setInterval(() => { if (tab === "rens") updClean(); }, 30000);
+
+render();
+</script>
+</body>
+</html>
